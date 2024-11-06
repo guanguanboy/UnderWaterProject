@@ -1,3 +1,4 @@
+"""
 import cv2
 import numpy as np
 import mxnet as mx
@@ -28,26 +29,32 @@ def process_depth_images(input_dir, output_dir):
     for filename in sorted(os.listdir(input_dir)):
         if filename.endswith('.png'):
             # 读取深度图
-            output_path = os.path.join(output_dir, f"normal_{filename}")
-            if os.path.exists(output_path):
-                print(f"File {output_path} already exists. Skipping...")
-                continue  # 跳过该文件
+            #output_path = os.path.join(output_dir, f"normal_{filename}") #for gt
+            output_path = os.path.join(output_dir, f"normal_depth{filename}") #for gt
+            #if os.path.exists(output_path):
+            #    print(f"File {output_path} already exists. Skipping...")
+            #    continue  # 跳过该文件
 
             depth_path = os.path.join(input_dir, filename)
             depth = cv2.imread(depth_path, 0)
+            print('depth size=',depth.shape)
+
             padded_depth, orig_h, orig_w = resize_to_square(depth)
-            
+            print('orig_h=',orig_h, orig_w)
             # 计算法线并恢复原始尺寸
             normal = np.array(depth2normal(mx.nd.array(padded_depth)) * 255)
             normal = cv2.cvtColor(np.transpose(normal, [1, 2, 0]), cv2.COLOR_BGR2RGB)
             normal = normal[:orig_h, :orig_w]  # 去除填充区域
-
+            normal = cv2.resize(normal, (2384, 1592), interpolation=cv2.INTER_AREA)
+            print('nomral size=',normal.shape)
             cv2.imwrite(output_path, normal.astype(np.uint8))
             print(f"Saved normal map to {output_path}")
 
 if __name__ == '__main__':
-    input_directory = '/data/gl/Codes/UnderWater3D/Datasets/D3_depth_png_gt/'
-    output_directory = '/data/gl/Codes/UnderWater3D/Datasets/D3_normal_png_gt/'
+    #input_directory = '/data/gl/Codes/UnderWater3D/Datasets/D3_depth_png_gt/'
+    #output_directory = '/data/gl/Codes/UnderWater3D/Datasets/D3_normal_png_gt/'
+    input_directory = '/data/gl/Codes/UnderWater3D/Datasets/data2/languanzhou/underwater/MiDaS/output/D3_g/'
+    output_directory = '/data/gl/Codes/UnderWater3D/Datasets/D3_normal_png_pred_test/'
     process_depth_images(input_directory, output_directory)
 
 """
@@ -112,8 +119,7 @@ def calculate_directory_angle_difference(dir1, dir2):
         print("No matching files found.")
 
 if __name__ == '__main__':
-    dir1 = '/mnt/petrelfs/tangyiwen/water-splatting/gt_surface_normals_visualization'
-    dir2 = '/mnt/petrelfs/tangyiwen/water-splatting/surface_normals_visualization'
+    dir1 = '/data/gl/Codes/UnderWater3D/Datasets/D3_normal_png_gt'
+    dir2 = '/data/gl/Codes/UnderWater3D/Datasets/D3_normal_png_pred_test'
     calculate_directory_angle_difference(dir1, dir2)
 
-"""
