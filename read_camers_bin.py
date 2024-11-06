@@ -30,11 +30,10 @@ for image_id, image in reconstruction.images.items():
     for p2d in image.points2D:
         if p2d.has_point3D():
             print(f"  2D Point: {p2d.xy} -> 3D Point ID: {p2d.point3D_id}")
- 
+"""
 # 访问三维点信息
 for point3D_id, point3D in reconstruction.points3D.items():
     print(f"3D Point ID: {point3D_id}")
     print(f"Coordinates: {point3D.xyz}")
     #print(f"Observed by {len(point3D.image_ids)} images")
 
-"""
