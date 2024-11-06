@@ -71,12 +71,12 @@ def save_ply(filename, points):
 
 # Example usage:
 # Define the camera intrinsic matrix (fx, fy, cx, cy)
-intrinsics = np.array([[360, 0, 0],  # fx, 0, cx
-                       [0, 150, 0],  # 0, fy, cy
+intrinsics = np.array([[1518, 0, 685.90],  # fx, 0, cx
+                       [0, 1519, 450.59],  # 0, fy, cy
                        [0, 0, 1]])       # 0, 0, 1
 
 # Load depth map from PNG file (make sure it is in 16-bit grayscale)
-depth_image = Image.open('depth/00192.png')
+depth_image = Image.open('EvalImages/depth_6000_a6a94963bfa81e110bea.png')
 #depth_image = depth_image.convert('L')  # Open the PNG image
 #gray_image_16bit = depth_image.convert("I")  # 将L模式转换为32位整数模式
 
@@ -100,7 +100,7 @@ depth_map = depth_map.astype(np.float32) / 1000.0  # Assuming depth is in mm, co
 point_cloud = depth_to_point_cloud(depth_map, intrinsics)
 
 # Save the point cloud to a PLY file
-save_ply("00192.ply", point_cloud)
+save_ply("depth_6000_a6a94963bfa81e110bea.ply", point_cloud)
 
 print("Point cloud saved to output_point_cloud.ply")
 

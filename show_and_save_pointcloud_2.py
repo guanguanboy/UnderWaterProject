@@ -76,7 +76,7 @@ intrinsics = np.array([[36, 0, 0],  # fx, 0, cx
                        [0, 0, 1]])       # 0, 0, 1
 
 # Load depth map from PNG file (make sure it is in 16-bit grayscale)
-depth_image = Image.open('Depth/Image0004.png')
+depth_image = Image.open('EvalImages/depth_1000_6d5911b7c0cfc0e392d7.png')
 depth_image = depth_image.convert('L')  # Open the PNG image
 gray_image_16bit = depth_image.convert("I")  # 将L模式转换为32位整数模式
 
@@ -100,7 +100,7 @@ depth_map = depth_map.astype(np.float32) / 1000.0  # Assuming depth is in mm, co
 point_cloud = depth_to_point_cloud(depth_map, intrinsics)
 
 # Save the point cloud to a PLY file
-save_ply("Image0004.ply", point_cloud)
+save_ply("depth_1000_6d5911b7c0cfc0e392d7.ply", point_cloud)
 
 print("Point cloud saved to output_point_cloud.ply")
 
