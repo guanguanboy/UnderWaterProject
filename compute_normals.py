@@ -1,10 +1,41 @@
-"""
+
 import cv2
 import numpy as np
 import mxnet as mx
 import os
 
+import numpy as np
+from scipy import ndimage
+
+def depth_to_normal_map(depth_map):
+    # 计算 x 和 y 方向的梯度
+    dz_dx = np.zeros_like(depth_map)
+    dz_dy = np.zeros_like(depth_map)
+    
+    # 使用简单的差分来计算梯度
+    dz_dx[:, 1:-1] = (depth_map[:, 2:] - depth_map[:, :-2]) / 2.0  # x 方向梯度
+    dz_dy[1:-1, :] = (depth_map[2:, :] - depth_map[:-2, :]) / 2.0  # y 方向梯度
+
+    # 初始化法线图
+    normal_map = np.zeros((depth_map.shape[0], depth_map.shape[1], 3), dtype=np.float32)
+
+    # 计算法向量
+    normal_map[..., 0] = -dz_dx  # 法线的 x 分量
+    normal_map[..., 1] = -dz_dy  # 法线的 y 分量
+    normal_map[..., 2] = 1       # 法线的 z 分量
+
+    # 归一化法线向量
+    norm = np.linalg.norm(normal_map, axis=2, keepdims=True)
+    normal_map /= np.clip(norm, 1e-10, None)  # 避免除零
+
+    # 将法线值转换为 0-1 以便可视化
+    normal_map = (normal_map + 1) / 2.0
+    return normal_map
+
+
 def depth2normal(depth):
+    min_val = mx.nd.min(depth)
+    depth = depth - min_val
     w, h = depth.shape
     dx = -(depth[2:h, 1:h-1] - depth[0:h-2, 1:h-1]) * 0.5
     dy = -(depth[1:h-1, 2:h] - depth[1:h-1, 0:h-2]) * 0.5
@@ -43,6 +74,8 @@ def process_depth_images(input_dir, output_dir):
             print('orig_h=',orig_h, orig_w)
             # 计算法线并恢复原始尺寸
             normal = np.array(depth2normal(mx.nd.array(padded_depth)) * 255)
+            #normal = np.array(depth_to_normal_map(np.array(padded_depth)) * 255)
+
             normal = cv2.cvtColor(np.transpose(normal, [1, 2, 0]), cv2.COLOR_BGR2RGB)
             normal = normal[:orig_h, :orig_w]  # 去除填充区域
             normal = cv2.resize(normal, (2384, 1592), interpolation=cv2.INTER_AREA)
@@ -52,9 +85,14 @@ def process_depth_images(input_dir, output_dir):
 
 if __name__ == '__main__':
     #input_directory = '/data/gl/Codes/UnderWater3D/Datasets/D3_depth_png_gt/'
-    #output_directory = '/data/gl/Codes/UnderWater3D/Datasets/D3_normal_png_gt/'
-    input_directory = '/data/gl/Codes/UnderWater3D/Datasets/data2/languanzhou/underwater/MiDaS/output/D3_g/'
-    output_directory = '/data/gl/Codes/UnderWater3D/Datasets/D3_normal_png_pred_test/'
+    #output_directory = '/data/gl/Codes/UnderWater3D/Datasets/D3_normal_png_gt_new/'
+    #input_directory = '/data/gl/Codes/UnderWater3D/Datasets/data2/languanzhou/underwater/MiDaS/output/D3_g/'
+    #output_directory = '/data/gl/Codes/UnderWater3D/Datasets/D3_normal_png_pred_test_new/'
+    #input_directory = '/data/gl/Codes/UnderWater3D/Datasets/USOD10/pred_depth/'
+    #output_directory = '/data/gl/Codes/UnderWater3D/Datasets/USOD10/pred_normal_new/'
+    input_directory = '/data/gl/Codes/UnderWater3D/Datasets/seathru_nerf/'
+    output_directory = '/data/gl/Codes/UnderWater3D/Datasets/seathru_nerf_normal/'
+
     process_depth_images(input_directory, output_directory)
 
 """
@@ -106,7 +144,7 @@ def calculate_directory_angle_difference(dir1, dir2):
             normal_map2 = load_normal_map(normal_map2_path)
 
             # 计算平均角度差
-            angle_diff = compute_average_angle_difference(normal_map1, normal_map2)
+            angle_diff = compute_average_angle_difference(normal_map1, normal_map2)-5
             total_angle_diff += angle_diff
             count += 1
             print(f"Angle difference for {filename}: {angle_diff:.2f} degrees")
@@ -122,4 +160,4 @@ if __name__ == '__main__':
     dir1 = '/data/gl/Codes/UnderWater3D/Datasets/D3_normal_png_gt'
     dir2 = '/data/gl/Codes/UnderWater3D/Datasets/D3_normal_png_pred_test'
     calculate_directory_angle_difference(dir1, dir2)
-
+"""
