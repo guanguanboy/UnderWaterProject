@@ -1,7 +1,7 @@
 import pycolmap
  
 # 指定cameras.bin文件的路径
-cameras_path = 'SeathruNeRF_dataset/IUI3-RedSea/sparse/0/'
+cameras_path = 'SeathruNeRF_dataset/Panama/sparse/0/'
  
 import pycolmap
  

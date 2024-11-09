@@ -36,8 +36,8 @@ def points3D_to_ply(colmap_project_path, output_ply_file):
 
 
 # 使用示例
-colmap_project_path = 'SeathruNeRF_dataset/Curasao/sparse/0/'  # COLMAP 项目路径
-output_ply_file = 'output_Curasao.ply'  # 输出的 PLY 文件路径
+colmap_project_path = 'SeathruNeRF_dataset/Panama/sparse/0/'  # COLMAP 项目路径
+output_ply_file = 'output_Panama.ply'  # 输出的 PLY 文件路径
 
 
 points3D_to_ply(colmap_project_path, output_ply_file)
